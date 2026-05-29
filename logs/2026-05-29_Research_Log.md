@@ -3,12 +3,12 @@
 **Topic:** ARINC 429 Physical Layer & Security Entry Points
 
 ## 1. Observations on BPRZ Signaling
-After reviewing the protocol fundamentals and the AIM technical manual, I focused on the Bipolar Return-to-Zero (BPRZ) encoding. 
+After reviewing the protocol fundamentals and the [AIM technical manual](https://www.aim-online.com/wp-content/uploads/2017/06/OVIEW429.pdf), I focused on the Bipolar Return-to-Zero (BPRZ) encoding. 
 
 **Key Technical Takeaways:**
 * The bus uses three distinct states: High (+10.0 V ± 1.0 V ), Low (-10.0 V ± 1.0 V ), and a Null state (0 V ± 0.5V).
-* I noticed that the "Return-to-Zero" part is the most critical for our IDS. Because the signal must hit ‹‹LI››0V‹‹/LI›› halfway through every bit, the receiver doesn't need a separate clock wire. 
-* **Project Impact:** This "self-clocking" nature means if an attacker tries to inject data and messes up the timing even slightly, the receiver will lose sync. This is a physical vulnerability we can monitor.
+* I noticed that the "Return-to-Zero" part is the most critical for our IDS. Because the signal must hit idle state or 0 V ± 0.5V halfway through every bit, the receiver doesn't need a separate clock wire. 
+* **Project Impact:** This "self-clocking" nature means if an attacker tries to inject data and messes up the timing even slightly, the receiver will lose sync. This is a physical vulnerability we can monitor. (Self clocking nature refers to each cycle returning to zero after every cycle. By noticing the timings and synchronisation of each zero cycles, we can look for anomalies/ intrusions.
 
 ## 2. Analysis of the "Gateway Pivot" (Santamarta Research)
 I watched the Ruben Santamarta Black Hat talk, specifically focusing on the segment regarding aviation network domains.
