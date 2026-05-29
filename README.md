@@ -16,6 +16,13 @@ We are keeping a daily log of our work to show how our research evolves over thi
 * `/docs`: Technical notes on BPRZ and ARINC 429 specs.
 * `/src`: The Python-based entropy engine (Development starts June 1).
 
+## Statement of Tools & Academic Integrity
+This research project utilizes the following third-party tools to support data processing:
+- **PyARINC429 (GitHub):** Used for low-level bitstream decoding and ARINC 429 word validation.
+- **BoodleBox AI (Gemini 3 Flash):** Used as a research assistant for technical documentation synthesis and logic brainstorming.
+
+All core Intrusion Detection logic, Shannon Entropy implementations, and anomaly detection thresholds are the original work of the authors.
+
 ## The Team
 * **Bibhab:** Research Lead (Focusing on the physics and threat models).
 * **Arnab:** Development Lead (Focusing on the data structures and coding - starting June 1).
