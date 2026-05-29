@@ -6,12 +6,12 @@
 After reviewing the protocol fundamentals and the AIM technical manual, I focused on the Bipolar Return-to-Zero (BPRZ) encoding. 
 
 **Key Technical Takeaways:**
-* The bus uses three distinct states: High (‹‹LI››+5V‹‹/LI››), Low (‹‹LI››-5V‹‹/LI››), and a Null state (‹‹LI››0V‹‹/LI››).
+* The bus uses three distinct states: High (+10.0 V ± 1.0 V ), Low (-10.0 V ± 1.0 V ), and a Null state (0 V ± 0.5V).
 * I noticed that the "Return-to-Zero" part is the most critical for our IDS. Because the signal must hit ‹‹LI››0V‹‹/LI›› halfway through every bit, the receiver doesn't need a separate clock wire. 
 * **Project Impact:** This "self-clocking" nature means if an attacker tries to inject data and messes up the timing even slightly, the receiver will lose sync. This is a physical vulnerability we can monitor.
 
 ## 2. Analysis of the "Gateway Pivot" (Santamarta Research)
-I watched the Ruben Santamarta Black Hat talk, specifically focusing on the 31:45 - 39:00 segment regarding aviation network domains.
+I watched the Ruben Santamarta Black Hat talk, specifically focusing on the segment regarding aviation network domains.
 
 **My Analysis:**
 The "air-gap" in modern aircraft is largely a myth. While the ARINC 429 bus itself is isolated, it connects to "Gateways" (like the Aircraft Interface Device or SATCOM units). 
