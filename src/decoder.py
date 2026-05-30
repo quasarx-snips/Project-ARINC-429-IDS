@@ -1,5 +1,6 @@
-import json
-with open("metadata.json", "r") as md:
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+with open(os.path.join(BASE_DIR, "metadata.json"), "r") as md:
    metadata = json.load(md)
 
 #sample = "10000000000000000000000000110000"
