@@ -11,7 +11,7 @@ Modern aircraft are no longer "air-gapped." With the rise of SATCOM gateways and
 ## Our Approach
 We are testing if **Shannon Entropy** can catch these attacks. Legitimate flight data (like altitude) follows a predictable, low-entropy pattern. An injection attack usually introduces "statistical noise" that we can detect.
 * **Physical Layer:** We monitor the Bipolar Return-to-Zero (BPRZ) timing and the "Null" states.
-* **Data Layer:** We calculate entropy on a sliding window of 32-bit words, specifically focusing on Label 030 (Altitude).
+* **Data Layer:** We calculate entropy on a sliding window of 32-bit words.
 
 ## Project Structure
 We are keeping a daily log of our work to show how our research evolves over this 14-day sprint.
