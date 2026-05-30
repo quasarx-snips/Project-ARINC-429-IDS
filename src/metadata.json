@@ -524,27 +524,7 @@
       }
     },
 
-    "371": {
-      "name": "Equipment Identifier",
-      "format": "DISCRETE",
-      "entropy": {
-        "expected_low": 0.00,
-        "expected_high": 0.20,
-        "alert_threshold": 0.70,
-        "notes": "Discrete word. Should be near-constant. Any change is a high-priority alert."
-      }
-    },
-
-    "377": {
-      "name": "Equipment Identifier (Alt)",
-      "format": "DISCRETE",
-      "entropy": {
-        "expected_low": 0.00,
-        "expected_high": 0.20,
-        "alert_threshold": 0.70,
-        "notes": "Alternate Equipment ID label. Same profile as 371. Unauthorized label injection target."
-      }
-    }
+    
 
   }
 }
