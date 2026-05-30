@@ -17,11 +17,11 @@ We are testing if **Shannon Entropy** can catch these attacks. Legitimate flight
 We are keeping a daily log of our work to show how our research evolves over this 14-day sprint.
 * `/logs`: Our daily research journals and observations.
 * `/docs`: Technical notes on BPRZ and ARINC 429 specs.
-* `/src`: The Python-based entropy engine (Development starts June 1).
+* `/src`: The Python-based entropy engine.
 
 ## Statement of Tools & Academic Integrity
 This research project utilizes the following third-party tools to support data processing:
-- **PyARINC429 (GitHub):** Used for low-level bitstream decoding and ARINC 429 word validation.
+- **PyARINC429 (GitHub):** This shall be used for learning purposes only
 - **BoodleBox AI (Gemini 3 Flash):** Used as a research assistant for technical documentation synthesis and logic brainstorming.
 
 All core Intrusion Detection logic, Shannon Entropy implementations, and anomaly detection thresholds are the original work of the authors.
