@@ -1,9 +1,10 @@
 ---
 name: Feature request
 about: Suggest a new detection logic or protocol feature
-title: ['Feature']
-labels: ['Enhancement', 'Entropy-Math']
+title: '["Feature"]'
+labels: ''
 assignees: ''
+
 ---
 
 **Is your feature request related to a problem? Please describe.**
