@@ -1,3 +1,6 @@
+![Layer: Data](https://img.shields.io/badge/Layer-Data-green)
+![Encoding: BNR%20%2F%20BCD](https://img.shields.io/badge/Encoding-BNR%20%2F%20BCD-yellow)
+![Word Size: 32--bit](https://img.shields.io/badge/Word%20Size-32--bit-blueviolet)
 # Technical Note: ARINC 429 Physical Layer & Media Specifications
 
 ## Overview
