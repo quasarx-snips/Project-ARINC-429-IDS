@@ -1,0 +1,273 @@
+{
+  "word_structure": {
+    
+    "label_bits": "1-8",
+    "sdi_bits": "9-10",
+    "data_bits": "11-29",
+    "ssm_bits": "30-31",
+    "parity_bit": "32"
+  },
+  
+  "sdi": {
+    
+    "00": "Source/Destination 0",
+    "01": "Source/Destination 1",
+    "10": "Source/Destination 2",
+    "11": "Source/Destination 3"
+  },
+  
+  "ssm_bnr": {
+    
+    "00": "Failure Warning",
+    "01": "No Computed Data",
+    "10": "Functional Test",
+    "11": "Normal Operation"
+  },
+  
+  "labels": {
+  
+              "014": {
+                "name": "Radio Height",
+                "format": "BNR",
+                "unit": "ft",
+                "signed": false,
+                "data_bits": 19
+              },
+              
+              "076": {
+                "name": "GPS Altitude",
+                "format": "BNR",
+                "unit": "ft",
+                "signed": true,
+                "data_bits": 19
+              },
+              
+              "101": {
+                "name": "Selected Heading",
+                "format": "BNR",
+                "unit": "deg",
+                "signed": false,
+                "data_bits": 19
+              },
+              
+              "102": {
+                "name": "Selected Altitude",
+                "format": "BNR",
+                "unit": "ft",
+                "signed": true,
+                "data_bits": 19
+              },
+              
+              "110": {
+                "name": "GPS Latitude",
+                "format": "BNR",
+                "unit": "deg",
+                "signed": true,
+                "data_bits": 19
+              },
+              
+              "111": {
+                "name": "GPS Longitude",
+                "format": "BNR",
+                "unit": "deg",
+                "signed": true,
+                "data_bits": 19
+              },
+              
+              "112": {
+                "name": "GPS Ground Speed",
+                "format": "BNR",
+                "unit": "kt",
+                "signed": false,
+                "data_bits": 19
+              },
+              
+              "120": {
+                "name": "GPS Track Angle",
+                "format": "BNR",
+                "unit": "deg",
+                "signed": false,
+                "data_bits": 19
+              },
+              
+              "121": {
+                "name": "UTC",
+                "format": "BNR",
+                "unit": "time",
+                "signed": false,
+                "data_bits": 19
+              },
+              
+              "130": {
+                "name": "Vertical Velocity",
+                "format": "BNR",
+                "unit": "ft/min",
+                "signed": true,
+                "data_bits": 19
+              },
+              
+              "164": {
+                "name": "Radio Height",
+                "format": "BNR",
+                "unit": "ft",
+                "signed": false,
+                "data_bits": 19
+              },
+              
+              "203": {
+                "name": "Barometric Altitude",
+                "format": "BNR",
+                "unit": "ft",
+                "signed": true,
+                "data_bits": 19
+              },
+              
+              "204": {
+                "name": "Baro Corrected Altitude",
+                "format": "BNR",
+                "unit": "ft",
+                "signed": true,
+                "data_bits": 19
+              },
+              
+              "205": {
+                "name": "Computed Airspeed",
+                "format": "BNR",
+                "unit": "kt",
+                "signed": false,
+                "data_bits": 19
+              },
+              
+              "206": {
+                "name": "Mach Number",
+                "format": "BNR",
+                "unit": "mach",
+                "signed": false,
+                "data_bits": 19
+              },
+              
+              "210": {
+                "name": "True Airspeed",
+                "format": "BNR",
+                "unit": "kt",
+                "signed": false,
+                "data_bits": 19
+              },
+              
+              "212": {
+                "name": "Altitude Rate",
+                "format": "BNR",
+                "unit": "ft/min",
+                "signed": true,
+                "data_bits": 19
+              },
+              
+              "213": {
+                "name": "Altitude Rate",
+                "format": "BNR",
+                "unit": "ft/min",
+                "signed": true,
+                "data_bits": 19
+              },
+              
+              "232": {
+                "name": "Air Temperature",
+                "format": "BNR",
+                "unit": "degC",
+                "signed": true,
+                "data_bits": 19
+              },
+              
+              "234": {
+                "name": "Barometric Correction",
+                "format": "BNR",
+                "unit": "mbar",
+                "signed": false,
+                "data_bits": 19
+              },
+              
+              "310": {
+                "name": "Latitude",
+                "format": "BNR",
+                "unit": "deg",
+                "signed": true,
+                "data_bits": 19
+              },
+              
+              "311": {
+                "name": "Longitude",
+                "format": "BNR",
+                "unit": "deg",
+                "signed": true,
+                "data_bits": 19
+              },
+              
+              "312": {
+                "name": "Ground Speed",
+                "format": "BNR",
+                "unit": "kt",
+                "signed": false,
+                "data_bits": 19
+              },
+              
+              "313": {
+                "name": "Track Angle",
+                "format": "BNR",
+                "unit": "deg",
+                "signed": false,
+                "data_bits": 19
+              },
+              
+              "314": {
+                "name": "True Heading",
+                "format": "BNR",
+                "unit": "deg",
+                "signed": false,
+                "data_bits": 19
+              },
+              
+              "320": {
+                "name": "Magnetic Heading",
+                "format": "BNR",
+                "unit": "deg",
+                "signed": false,
+                "data_bits": 19
+              },
+              
+              "321": {
+                "name": "True Heading",
+                "format": "BNR",
+                "unit": "deg",
+                "signed": false,
+                "data_bits": 19
+              },
+              
+              "325": {
+                "name": "Roll Angle",
+                "format": "BNR",
+                "unit": "deg",
+                "signed": true,
+                "data_bits": 19
+              },
+              
+              "335": {
+                "name": "Track Angle Rate",
+                "format": "BNR",
+                "unit": "deg/s",
+                "signed": true,
+                "data_bits": 19
+              },
+              
+              "371": {
+                "name": "Equipment Identifier",
+                "format": "DISCRETE"
+              },
+              
+              "377": {
+                "name": "Equipment Identifier",
+                "format": "DISCRETE"
+              }
+              
+              
+  }
+}
