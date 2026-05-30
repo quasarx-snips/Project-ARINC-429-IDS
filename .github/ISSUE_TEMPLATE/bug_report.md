@@ -1,14 +1,5 @@
 ---
 name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
-
----
-
----
-name: Bug report
 about: Create a report to help us improve the ARINC 429 Decoder/IDS
 title: ['Bug']
 labels: ['Bug', 'Protocol-Logic']
