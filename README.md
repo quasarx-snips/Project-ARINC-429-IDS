@@ -16,9 +16,9 @@ We are testing if **Shannon Entropy** can catch these attacks. Legitimate flight
 
 ## Project Structure
 We are keeping a daily log of our work to show how our research evolves over this 14-day sprint.
-* `/logs`: Our daily research journals and observations.
-* `/docs`: Technical notes on BPRZ and ARINC 429 specs.
-* `/src`: The Python-based entropy engine.
+* [`/logs`](https://github.com/quasarx-snips/Project-ARINC-429-IDS/tree/main/logs): Our daily research journals and observations.
+* [`/docs`](https://github.com/quasarx-snips/Project-ARINC-429-IDS/tree/main/docs): Technical notes on BPRZ and ARINC 429 specs.
+* [`/src`](https://github.com/quasarx-snips/Project-ARINC-429-IDS/tree/main/src): The Python-based entropy engine.
 
 ## Statement of Tools & Academic Integrity
 This research project utilizes the following third-party tools to support data processing:
