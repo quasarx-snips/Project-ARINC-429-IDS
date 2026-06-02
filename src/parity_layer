@@ -1,0 +1,19 @@
+""" def layer_2_parity_check(word_32bit: str) -> dict:
+
+    if not word_32bit or not isinstance(word_32bit, str):
+        return {"status": "ALERT", "reason": "Input is None or not a string"}
+
+    word = word_32bit.strip()
+    if len(word) != 32:
+        return {"status": "ALERT", "reason": f"Invalid frame length: {len(word)}"}
+
+    ones_count = word.count('1')
+
+
+    if ones_count % 2 != 0:
+        return {"status": "PASS"}
+    else:
+        return {"status": "ALERT", "reason": "Parity failure: Even number of 1s detected"}
+
+"""
+        
