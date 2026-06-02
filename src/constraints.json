@@ -3,186 +3,186 @@
         "name": "Radio Height",
         "min_val": 0.0,
         "max_val": 2500.0,
-        "max_delta": 20.0,  # Max vertical descent/climb displacement in 100ms (~12,000 ft/min extreme)
+        "max_delta": 20.0
     },
     "076": {
         "name": "GPS Altitude",
         "min_val": -131072.0,
         "max_val": 131072.0,
-        "max_delta": 25.0,  # ~15,000 ft/min physics limit during catastrophic dive/recovery
+        "max_delta": 25.0
     },
     "101": {
         "name": "Selected Heading",
         "min_val": 0.0,
         "max_val": 360.0,
-        "max_delta": 5.0,   # High-rate pilot knob spinning
+        "max_delta": 5.0
     },
     "102": {
         "name": "Selected Altitude",
         "min_val": -65536.0,
         "max_val": 65536.0,
-        "max_delta": 1000.0, # Large manual pilot selections updates per frame
+        "max_delta": 1000.0
     },
     "110": {
         "name": "GPS Latitude",
         "min_val": -90.0,
         "max_val": 90.0,
-        "max_delta": 0.0005, # ~300 knots max ground speed displacement in 100ms
+        "max_delta": 0.0005
     },
     "111": {
         "name": "GPS Longitude",
         "min_val": -180.0,
         "max_val": 180.0,
-        "max_delta": 359.5,  # High max_delta specifically allowed to tolerate the -180 to +180 wrap-around edge case
+        "max_delta": 359.5
     },
     "112": {
         "name": "GPS Ground Speed",
         "min_val": 0.0,
         "max_val": 1024.0,
-        "max_delta": 3.0,   # Max realistic structural acceleration (~1G acceleration/deceleration)
+        "max_delta": 3.0
     },
     "120": {
         "name": "GPS Track Angle",
         "min_val": 0.0,
         "max_val": 360.0,
-        "max_delta": 3.0,   # ~30 deg/sec maximum dynamic turn rate
+        "max_delta": 3.0
     },
     "121": {
         "name": "UTC Time",
         "min_val": 0.0,
         "max_val": 86400.0,
-        "max_delta": 1.0,   # Time cannot jump backward or leap significantly forward
+        "max_delta": 1.0
     },
     "130": {
         "name": "Vertical Velocity",
         "min_val": -16384.0,
         "max_val": 16384.0,
-        "max_delta": 1500.0, # Max vertical acceleration change (ft/min^2) translated to 100ms window
+        "max_delta": 1500.0
     },
     "164": {
         "name": "Radio Height (Alt)",
         "min_val": 0.0,
         "max_val": 2500.0,
-        "max_delta": 20.0,
+        "max_delta": 20.0
     },
     "203": {
         "name": "Barometric Altitude",
         "min_val": -131072.0,
         "max_val": 131072.0,
-        "max_delta": 25.0,
+        "max_delta": 25.0
     },
     "204": {
         "name": "Baro Corrected Altitude",
         "min_val": -131072.0,
         "max_val": 131072.0,
-        "max_delta": 25.0,
+        "max_delta": 25.0
     },
     "205": {
         "name": "Computed Airspeed",
         "min_val": 0.0,
         "max_val": 512.0,
-        "max_delta": 3.0,
+        "max_delta": 3.0
     },
     "206": {
         "name": "Mach Number",
         "min_val": 0.0,
         "max_val": 4.0,
-        "max_delta": 0.005, # Physically limited to ~0.05 Mach per second per your metadata notes
+        "max_delta": 0.005
     },
     "210": {
         "name": "True Airspeed",
         "min_val": 0.0,
         "max_val": 1024.0,
-        "max_delta": 4.0,
+        "max_delta": 4.0
     },
     "212": {
         "name": "Altitude Rate",
         "min_val": -16384.0,
         "max_val": 16384.0,
-        "max_delta": 1500.0,
+        "max_delta": 1500.0
     },
     "213": {
         "name": "Altitude Rate (Alt)",
         "min_val": -16384.0,
         "max_val": 16384.0,
-        "max_delta": 1500.0,
+        "max_delta": 1500.0
     },
     "232": {
         "name": "Air Temperature",
         "min_val": -256.0,
         "max_val": 256.0,
-        "max_delta": 0.5,   # Environmental thermal inertia limits instant jumps
+        "max_delta": 0.5
     },
     "234": {
         "name": "Barometric Correction",
         "min_val": 0.0,
         "max_val": 128.0,
-        "max_delta": 5.0,   # Knob adjustment speed limits
+        "max_delta": 5.0
     },
     "310": {
         "name": "Latitude",
         "min_val": -90.0,
         "max_val": 90.0,
-        "max_delta": 0.0005,
+        "max_delta": 0.0005
     },
     "311": {
         "name": "Longitude",
         "min_val": -180.0,
         "max_val": 180.0,
-        "max_delta": 359.5, # Accommodates -180/+180 wrap-around
+        "max_delta": 359.5
     },
     "312": {
         "name": "Ground Speed",
         "min_val": 0.0,
         "max_val": 1024.0,
-        "max_delta": 3.0,
+        "max_delta": 3.0
     },
     "313": {
         "name": "Track Angle",
         "min_val": 0.0,
         "max_val": 360.0,
-        "max_delta": 3.0,
+        "max_delta": 3.0
     },
     "314": {
         "name": "True Heading",
         "min_val": 0.0,
         "max_val": 360.0,
-        "max_delta": 3.0,
+        "max_delta": 3.0
     },
     "320": {
         "name": "Magnetic Heading",
         "min_val": 0.0,
         "max_val": 360.0,
-        "max_delta": 3.0,
+        "max_delta": 3.0
     },
     "321": {
         "name": "True Heading (Alt)",
         "min_val": 0.0,
         "max_val": 360.0,
-        "max_delta": 3.0,
+        "max_delta": 3.0
     },
     "325": {
         "name": "Roll Angle",
         "min_val": -180.0,
         "max_val": 180.0,
-        "max_delta": 4.5,   # ~45 deg/sec maximum structural roll rate acceleration
+        "max_delta": 4.5
     },
     "335": {
         "name": "Track Angle Rate",
         "min_val": -8.0,
         "max_val": 8.0,
-        "max_delta": 2.0,   # Angular acceleration bounds
+        "max_delta": 2.0
     },
     "371": {
         "name": "Equipment Identifier",
-        "min_val": 0,       # Custom handler for discrete logic 
-        "max_val": float('inf'), 
-        "max_delta": 0,     # Discretes are static constants; any variance is an injection attack
+        "min_val": 0,
+        "max_val": 999999,
+        "max_delta": 0
     },
     "377": {
         "name": "Equipment Identifier (Alt)",
         "min_val": 0,
-        "max_val": float('inf'),
-        "max_delta": 0,
+        "max_val": 999999,
+        "max_delta": 0
     }
 }
