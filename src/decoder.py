@@ -30,24 +30,4 @@ def decode(sample):
 
   return result
 
-def layer_2_parity_check(word_32bit: str) -> dict:
-    """
-    Validates odd parity across a 32-bit ARINC 429 word.
-    """
-    # 1. Handle None or non-string inputs
-    if not word_32bit or not isinstance(word_32bit, str):
-        return {"status": "ALERT", "reason": "Input is None or not a string"}
 
-    # 2. Clean and validate length
-    word = word_32bit.strip()
-    if len(word) != 32:
-        return {"status": "ALERT", "reason": f"Invalid frame length: {len(word)}"}
-
-    # 3. Calculate parity
-    ones_count = word.count('1')
-
-    # 4. Odd parity check
-    if ones_count % 2 != 0:
-        return {"status": "PASS"}
-    else:
-        return {"status": "ALERT", "reason": "Parity failure: Even number of 1s detected"}
