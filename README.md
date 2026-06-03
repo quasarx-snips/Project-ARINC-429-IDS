@@ -47,7 +47,7 @@ This research project utilizes the following third-party tools to support data p
 All core Intrusion Detection logic, Shannon Entropy implementations, AI Brain logic and anomaly detection thresholds are the original work of the authors.
 
 ## The Researcher
-* **Bibhab:** 
+ **Bibhab Saha** 
 
 ---
 *This repository is a work-in-progress for a formal research study (May 29 - June 14, 2026).*
