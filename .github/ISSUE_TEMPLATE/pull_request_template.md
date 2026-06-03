@@ -4,7 +4,7 @@
 A brief summary of the logic added.
 
 **Related Issue**
-Fixes # (Link the Issue number here)
+Fixes
 
 **Protocol Validation Checklist**
 - [DONE] **Bit Mapping:** Verified against AIM Manual Page 13.
