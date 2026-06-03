@@ -87,12 +87,101 @@ We validate against **3 attack vectors**:
 
 ## Project Structure
 
-We are keeping a daily log of our work to show how our research evolves over this 14-day sprint.
+```
+Project-ARINC-429-IDS/
+│
+├── 📄 README.md                          # This file — project overview
+├── 📄 LICENSE                            # MIT License
+├── 📄 CONTRIBUTING.md                    # Contribution guidelines (5-layer aligned)
+├── 📄 SECURITY.md                        # Vulnerability reporting & security policy
+├── 📄 requirements.txt                   # Python dependencies (numpy)
+│
+├── 📁 src/                               # Core IDS implementation
+│   ├── ids_core.py                       # Main orchestration pipeline (L1-L5)
+│   ├── L1.py                             # Layer 1: Parity & BPRZ timing
+│   ├── L2.py                             # Layer 2: Replay & temporal integrity
+│   ├── L3.py                             # Layer 3: Physics constraints
+│   ├── L4.py                             # Layer 4: Adaptive anomaly scoring
+│   ├── L5.py                             # Layer 5: Welford feature anomaly
+│   ├── decoder.py                        # ARINC 429 BNR decoder
+│   ├── entropy_engine.py                 # Shannon entropy calculations
+│   ├── temporarily_fx.py                 # Orchestration helpers (DEPRECATED)
+│   ├── constraints.json                  # Per-label physics bounds (min/max/max_delta)
+│   ├── metadata.json                     # Label definitions & entropy config
+│   ├── teleport_attack.py                # Generate teleportation attack vectors
+│   ├── parity_poison.py                  # Generate parity corruption attack vectors
+│   └── replay_attack.py                  # Generate frame replay attack vectors
+│
+├── 📁 data/                              # Attack simulation datasets
+│   ├── teleport_attack.csv               # 100 frames: altitude jumps (L3 catch)
+│   ├── parity_poison.csv                 # 100 frames: parity bit flip (L1A catch)
+│   └── replay_attack.csv                 # 100 frames: frame duplication (L2B catch)
+│
+├── 📁 docs/                              # Technical documentation
+│   ├── QUICKSTART.md                     # Installation, usage, troubleshooting
+│   ├── API.md                            # Function signatures for all layers (L1-L5)
+│   └── LAYER_SPECIFICATIONS.md           # Detailed threat models & detection methods
+│
+├── 📁 logs/                              # Daily research journals
+│   ├── imgs/                             # Screenshots & diagrams
+│   │   └── .gitignore                    # (empty — stores entropy baseline plots)
+│   ├── 2026-05-29_Research_Log.md        # Day 1: BPRZ & gateway analysis
+│   ├── 2026-05-30_Research_Log.md        # Day 2: BNR data mapping
+│   ├── 2026-05-31_Research_Log.md        # Day 3: Entropy & Kanban architecture
+│   ├── 2026-06-01_Research_Log.md        # Day 4: Attack simulation frameworks
+│   ├── 2026-06-02_Research_Log.md        # Day 5: (Core pipeline development)
+│   ├── 2026-06-03_Research_Log.md        # Day 6: Five-layer implementation
+│   └── .gitignore                        # Ignores daily humanised logs
+│
+└── 📁 .github/                           # GitHub-specific configuration
+    └── workflows/                        # CI/CD automation (planned)
+```
 
-* [`/logs`](https://github.com/quasarx-snips/Project-ARINC-429-IDS/tree/main/logs): Our daily research journals and observations.
-* [`/docs`](https://github.com/quasarx-snips/Project-ARINC-429-IDS/tree/main/docs): Technical notes on BPRZ, ARINC 429 specs, and data format.
-* [`/src`](https://github.com/quasarx-snips/Project-ARINC-429-IDS/tree/main/src): Python-based IDS core modules (layer implementations, decoders, metadata).
-* [`/data`](https://github.com/quasarx-snips/Project-ARINC-429-IDS/tree/main/data): Attack simulation datasets and test vectors.
+### Key Files Explained
+
+**Core IDS Engine:**
+- `src/ids_core.py` — **Main entry point**. Runs the full 5-layer pipeline on CSV datasets. `python3 src/ids_core.py` tests all 3 attack vectors.
+- `src/constraints.json` — Kinematic bounds per label (min/max altitude, max descent rate, etc.)
+- `src/metadata.json` — Label definitions (names, units, entropy thresholds)
+
+**Layer Implementations:**
+- `src/L1.py` → Parity & BPRZ timing (protocol validation)
+- `src/L2.py` → Replay dedup & timestamp monotonicity
+- `src/L3.py` → Value bounds & kinematic continuity
+- `src/L4.py` → EWMA + rolling z-score anomaly detection
+- `src/L5.py` → Welford feature-space anomaly detection
+
+**Attack Generation:**
+- `src/teleport_attack.py` → Generates 100-frame CSV with altitude jumps (tests L3)
+- `src/parity_poison.py` → Generates 100-frame CSV with bit flips (tests L1A)
+- `src/replay_attack.py` → Generates 100-frame CSV with frame duplicates (tests L2B)
+
+**Documentation:**
+- `docs/QUICKSTART.md` — **Start here** for installation & first run
+- `docs/API.md` — API reference for all layer functions
+- `docs/LAYER_SPECIFICATIONS.md` — Threat models, false-negative risks, tuning constants
+
+**Research Logs:**
+- `logs/2026-06-*.md` — Daily journals tracking research progress and decisions
+
+## Quick Start
+
+### 1. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Run the Full Pipeline
+```bash
+python3 src/ids_core.py
+```
+
+Expected output: Detection results across 3 attack datasets with per-layer attribution.
+
+### 3. Explore the Code
+- API reference: `docs/API.md`
+- Layer specs: `docs/LAYER_SPECIFICATIONS.md`
+- Setup guide: `docs/QUICKSTART.md`
 
 ## Project Timeline
 
