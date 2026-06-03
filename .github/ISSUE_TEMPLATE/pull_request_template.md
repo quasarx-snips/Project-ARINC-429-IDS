@@ -10,7 +10,7 @@ Fixes # (Link the Issue number here)
 - [DONE] **Bit Mapping:** Verified against AIM Manual Page 13.
 - [DONE] **Label Flip:** Bits 1-8 are reversed for correct octal decoding.
 - [DONE] **Sign Bit:** Bit 29 logic handles Plus/Minus correctly.
-- [UNDONE] **Parity:** Bit 32 Odd Parity check is implemented.
+- [DONE] **Parity:** Bit 32 Odd Parity check is implemented.
 - [DONE] **Metadata:** `src/metadata.json` has been updated with new thresholds.
 
 **Testing Performed**
