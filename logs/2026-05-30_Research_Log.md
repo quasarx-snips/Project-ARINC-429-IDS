@@ -27,7 +27,7 @@ By narrowing the scope, we ensure the IDS is "High Precision." This reduces the 
 
 ## 3. Next Steps
 * I will finalize the `docs/` folder by uploading the humanized technical notes.
-* Arnab and I will begin **co-developing** the Shannon Entropy sliding-window function snippet by snippet starting June 1st.
+* I will begin **developing** the Shannon Entropy sliding-window function snippet by snippet starting June 1st.
 * I need to define the "Malicious Word" test suite (e.g., rapid altitude jumps) to validate our entropy thresholds against the BNR baseline.
 
 #### *Research assisted by BoodleBox AI for data synthesis and documentation structuring.
