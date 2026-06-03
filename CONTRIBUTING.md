@@ -1,6 +1,6 @@
 # Contributing to Project ARINC 429 IDS
 
-First off, thank you for contributing to the development of this Intrusion Detection System! This project is a collaborative effort between **Bibhab Saha** (Research Lead) and **Arnab Paul** (Lead Developer).
+First off, thank you for contributing to the development of this Intrusion Detection System! This research is an enthusiastic approach by **Bibhab Saha**, a 12th grade passout.
 
 ##  Our Co-Development Methodology: "Snippet-by-Snippet"
 To ensure maximum precision in our bit-slicing logic and entropy calculations, we follow an incremental development process:
@@ -24,7 +24,7 @@ All code contributions must adhere to the following ARINC 429 BNR specifications
 1.  **Open an Issue:** Before writing code, ensure there is an Issue describing the feature or bug.
 2.  **Branching:** Create a feature branch for your snippet (e.g., `feature/label-030-logic`).
 3.  **Pull Requests:** Submit a PR once the snippet passes local validation. 
-4.  **Peer Review:** Bibhab and Arnab must both review and approve the logic before it is merged into `main`.
+4.  **Peer Review:** Bibhab must review and approve the logic before it is merged into `main`.
 
 ##  Testing Requirements
 *   Every new decoder function must include at least one "Malicious Word" test case (e.g., an out-of-range altitude value) to verify the IDS alert trigger.
