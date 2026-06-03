@@ -17,19 +17,19 @@ This pivot ensures the IDS remains "Stealthy-Attack Aware." By using an adaptive
 **Evidence:** [Entropy Baseline Screenshot](https://github.com/quasarx-snips/Project-ARINC-429-IDS/blob/main/logs/imgs/Screenshot%202026-05-31%20201552.png)
 
 ## 2. Kanban Architecture & Team Handoff Setup
-I finalized the GitHub Project board to enable seamless co-development with Arnab starting June 1st.
+I finalized the GitHub Project board.
 
 **Key Technical Takeaways:**
-* **Three-Column Pipeline:** Done (The Foundation) | To Do (Blue Team - Arnab) | To Do (Red Team - Bibhab)
+* **Three-Column Pipeline:** Done (The Foundation) | To Do (Blue Team) | To Do (Red Team)
 * **User Story Format:** Each task includes a "Definition of Done" to ensure quality standards and prevent technical debt.
 
 
 **Project Impact:**
-The board now serves as a "Living Specification." Arnab can see exactly what success looks like for each task without needing clarification calls.
+The board now serves as a "Living Specification." I can see exactly what success looks like for each task without needing clarification calls.
 
 ## 3. Next Steps
-* **Arnab's Day 1 (June 1):** Begin Layer 1 (BPRZ Timing Monitor) and Layer 3 (Multi-Label Delta Tracker).
-* **Bibhab's Red Team:** Finalize the "Teleport" and "Parity Poisoning" attack scripts to test Arnab's defense logic.
+* **Begin Layer 1 (BPRZ Timing Monitor) and Layer 3 (Multi-Label Delta Tracker).
+* **Bibhab's Red Team:** Finalize the "Teleport" and "Parity Poisoning" attack scripts to test defense logic.
 * **Co-Development:** Snippet-by-snippet integration starting with the Master IDS Pipeline.
 
 ---
