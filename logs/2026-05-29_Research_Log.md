@@ -21,7 +21,7 @@ The "air-gap" in modern aircraft is largely a myth. While the ARINC 429 bus itse
 
 ## 3. Next Steps
 * Tomorrow (May 30), I will look into the specific structure of Label 030 (Altitude) to see how the bits are mapped.
-* I need to prepare the logic rules for Arnab so he can start the data structure coding on June 1st.
+* I need to prepare the logic rules so I can start the data structure coding on June 1st.
 
   
 #### *Research assisted by BoodleBox AI for data synthesis and documentation structuring.
