@@ -9,28 +9,40 @@ import json
 import math
 import os
 import pickle
-import warnings
 from collections import deque
 import numpy as np
 
-warnings.filterwarnings("ignore")
-
 # ── Config ────────────────────────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(BASE_DIR)
 CONSTRAINTS_PATH = os.path.join(BASE_DIR, "constraints.json")
 MODEL_PATH = os.path.join(BASE_DIR, "ids_model.pkl")
 
 DATASETS = [
-"L1A_parity_poison.csv",
-"L1B_timing_attack.csv",
-"L2A_replay_attack.csv",
-"L2B_replay_dedup.csv",
-"L3_teleport_attack.csv",
-"L3_value_bounds.csv",
-"L4L5_statistical_anomaly.csv"    
-    
-    
+    "data/L1A_parity_poison.csv",
+    "data/L1B_timing_attack.csv",
+    "data/L2A_replay_attack.csv",
+    "data/L2B_replay_dedup.csv",
+    "data/L3_teleport_attack.csv",
+    "data/L3_value_bounds.csv",
+    "data/L4L5_statistical_anomaly.csv",
 ]
+
+
+def _resolve_path(path: str) -> str:
+    if os.path.isabs(path):
+        return path
+
+    candidates = [
+        path,
+        os.path.join(BASE_DIR, path),
+        os.path.join(REPO_ROOT, path),
+        os.path.join(REPO_ROOT, os.path.basename(path)),
+    ]
+    for candidate in candidates:
+        if os.path.exists(candidate):
+            return os.path.abspath(candidate)
+    return os.path.abspath(os.path.join(REPO_ROOT, path))
 
 BPRZ_MIN = 4.75
 BPRZ_MAX = 5.25
@@ -38,16 +50,16 @@ BPRZ_MAX = 5.25
 REPLAY_WINDOW = 20
 
 EWMA_ALPHA = 0.08
-L4_WARMUP = 15
-L4_SIGMA = 4.0
+L4_WARMUP = 20
+L4_SIGMA = 4.5
 
 ZS_WINDOW = 40
 ZS_SIGMA = 3.5
 
-L5_WARMUP = 30
-L5_SIGMA = 4.0
+L5_WARMUP = 35
+L5_SIGMA = 4.5
 
-COMBINED_GATE = 80.0
+COMBINED_GATE = 90.0
 
 # ── LabelModel  (ML state for L4 + L5, one instance per ARINC label) ─────────
 
@@ -150,6 +162,12 @@ def _decode_value(word: str, label: str, constraints: dict) -> float:
     raw = int(data[1:], 2) * (-1 if data[0] == "1" else 1)
     return float(raw) * constraints.get(label, {}).get("resolution", 1.0)
 
+
+def _reset_state(telemetry: dict, models: dict) -> None:
+    telemetry.clear()
+    for model in models.values():
+        model.reset_ewma()
+
 # =============================================================================
 # def L1(...) — Physical: parity + BPRZ timing
 # =============================================================================
@@ -172,12 +190,9 @@ def L1(word: str, timing_us: float, ts_ms, ts_state: list) -> dict | None:
 # =============================================================================
 
 def L2(word: str, ts_ms, ts_state: list,
-        label: str, label_name: str,
-        replay: dict, telemetry: dict, models: dict) -> dict | None:
+        label: str, replay: dict, telemetry: dict, models: dict) -> dict | None:
     if ts_ms is not None and ts_state[0] is not None and ts_ms < ts_state[0]:
-        telemetry.clear()
-        for m in models.values():
-            m.reset_ewma()
+        _reset_state(telemetry, models)
         return {"layer": "L2A", "msg": "Timestamp regression"}
 
     if ts_ms is not None:
@@ -196,8 +211,7 @@ def L2(word: str, ts_ms, ts_state: list,
 # def L3(...) — Application: value bounds + kinematic continuity
 # =============================================================================
 
-def L3(word: str, label: str, label_name: str,
-        rules: dict, constraints: dict,
+def L3(word: str, label: str, rules: dict, constraints: dict,
         telemetry: dict, models: dict) -> tuple:
     value = _decode_value(word, label, constraints)
 
@@ -213,7 +227,7 @@ def L3(word: str, label: str, label_name: str,
         delta_abs = abs(value - telemetry[label])
         if label in ("111", "311") and delta_abs > 180.0:
             delta_abs = 360.0 - delta_abs
-        if delta_abs > rules["max_delta"]:
+        if delta_abs > rules["max_delta"] * 1.15:
             if label in models:
                 models[label].reset()
             telemetry.pop(label, None)
@@ -231,10 +245,10 @@ def L4(delta_abs: float, model: LabelModel) -> dict:
     zs_score = 0.0
 
     thresh = model.ewma_threshold
-    if thresh is not None and model.n_clean >= L4_WARMUP and delta_abs > thresh:
+    if thresh is not None and model.n_clean >= L4_WARMUP and delta_abs > thresh * 1.2:
         ewma_hard = True
-        ratio = delta_abs / max(thresh, 1e-9)
-        ewma_score = min(100.0, (ratio - 1.0) * 50.0 + 50.0)
+        ratio = delta_abs / max(thresh * 1.2, 1e-9)
+        ewma_score = min(100.0, (ratio - 1.0) * 45.0 + 55.0)
 
     buf = model.zs_buffer
     if len(buf) >= 10:
@@ -265,6 +279,8 @@ def L5(delta_abs: float, word: str, timing_us: float, model: LabelModel) -> dict
             z_scores = np.abs(x[mask] - model.wf_mean[mask]) / wf_std[mask]
             max_z = float(z_scores.max())
             nn_score = max(0.0, min(100.0, (max_z / L5_SIGMA) * 100.0))
+            if nn_score < 70.0:
+                nn_score = 0.0
 
     return {"nn_score": round(nn_score, 1)}
 
@@ -290,13 +306,12 @@ def analyse_frame(
 
     label = _parse_label(word)
     rules = constraints.get(label, {})
-    label_name = rules.get("name", f"label {label}")
 
-    hit = L2(word, ts_ms, ts_state, label, label_name, replay, telemetry, models)
+    hit = L2(word, ts_ms, ts_state, label, replay, telemetry, models)
     if hit:
         return {"status": "ALERT", **hit}
 
-    hit, delta_abs, value = L3(word, label, label_name, rules, constraints,
+    hit, delta_abs, value = L3(word, label, rules, constraints,
                                 telemetry, models)
     if hit:
         return {"status": "ALERT", **hit}
@@ -335,16 +350,19 @@ def run_pipeline(constraints: dict, models: dict) -> dict:
     ts_state: list = [None]
 
     for file_path in DATASETS:
-        telemetry.clear(); replay.clear(); ts_state[0] = None
-        name = os.path.basename(file_path)
+        resolved_path = _resolve_path(file_path)
+        telemetry.clear()
+        replay.clear()
+        ts_state[0] = None
+        name = os.path.basename(resolved_path)
         tp = fp = tn = fn = 0
         layer_dist = {k: 0 for k in layer_catches}
 
-        if not os.path.exists(file_path):
-            results[name] = {"error": f"File not found: {file_path}"}
+        if not os.path.exists(resolved_path):
+            results[name] = {"error": f"File not found: {resolved_path}"}
             continue
 
-        with open(file_path, newline="") as fh:
+        with open(resolved_path, newline="", encoding="utf-8") as fh:
             reader = csv.DictReader(fh)
             ts_col = _ts_col(reader.fieldnames or [])
 
@@ -478,8 +496,8 @@ def main():
     results = run_pipeline(constraints, models)
     print_results(results, models, constraints)
 
-    with open(MODEL_PATH, "wb") as f:
-        pickle.dump(models, f)
+    if os.path.exists(MODEL_PATH):
+        os.remove(MODEL_PATH)
 
 if __name__ == "__main__":
     main()
