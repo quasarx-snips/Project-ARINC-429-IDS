@@ -1,7 +1,7 @@
-# =============================================================================
+# =====
 # ids_core.py  —  ARINC 429 Intrusion Detection System
 # Run: python3 ids_core.py
-# =============================================================================
+# =====
 
 # ── Imports ───────────────────────────────────────────────────────────────────
 import csv
@@ -140,37 +140,58 @@ _ATTACK_COL = "is_attack"
 _TIMING_COL = "timing_interval_us"
 
 def _ts_col(fieldnames: list) -> str | None:
-    for c in fieldnames:
-        if c.lower() in _TS_ALIASES:
-            return c
+    # Find timestamp column name
+    for col_name in fieldnames:
+        if col_name.lower() in _TS_ALIASES:
+            return col_name
     return None
 
 def _parse_ts(ts: str) -> int | None:
+    # Parse time string "mm:ss:mmm" to milliseconds
     try:
-        p = ts.strip().split(":")
-        if len(p) == 3:
-            return int(p[0]) * 60_000 + int(p[1]) * 1_000 + int(p[2])
+        parts = ts.strip().split(":")
+        if len(parts) == 3:
+            minutes = int(parts[0])
+            seconds = int(parts[1])
+            millis = int(parts[2])
+            return minutes * 60_000 + seconds * 1_000 + millis
     except (ValueError, AttributeError):
         pass
     return None
 
 def _parse_label(word: str) -> str:
-    return oct(int(word[-8:][::-1], 2))[2:].zfill(3)
+    # Extract ARINC label from last 8 bits (reversed to octal)
+    last_8_bits = word[-8:]
+    reversed_bits = last_8_bits[::-1]
+    binary_value = int(reversed_bits, 2)
+    octal_str = oct(binary_value)[2:]
+    return octal_str.zfill(3)
 
 def _decode_value(word: str, label: str, constraints: dict) -> float:
-    data = word[3:22]
-    raw = int(data[1:], 2) * (-1 if data[0] == "1" else 1)
-    return float(raw) * constraints.get(label, {}).get("resolution", 1.0)
+    # Decode BNR value from word bits
+    data_bits = word[3:22]
+    sign_bit = data_bits[0]
+    value_bits = data_bits[1:]
+    
+    # Convert binary to integer
+    raw_value = int(value_bits, 2)
+    if sign_bit == "1":
+        raw_value = raw_value * -1
+    
+    # Apply resolution scaling
+    resolution = constraints.get(label, {}).get("resolution", 1.0)
+    return float(raw_value) * resolution
 
 
 def _reset_state(telemetry: dict, models: dict) -> None:
+    # Reset telemetry and model learning on regression
     telemetry.clear()
     for model in models.values():
         model.reset_ewma()
 
-# =============================================================================
+# =====
 # def L1(...) — Physical: parity + BPRZ timing
-# =============================================================================
+# =====
 
 def L1(word: str, timing_us: float, ts_ms, ts_state: list) -> dict | None:
     if word.count("1") % 2 == 0:
@@ -185,31 +206,38 @@ def L1(word: str, timing_us: float, ts_ms, ts_state: list) -> dict | None:
 
     return None
 
-# =============================================================================
+# =====
 # def L2(...) — Transport: timestamp regression + replay dedup
-# =============================================================================
+# =====
 
 def L2(word: str, ts_ms, ts_state: list,
         label: str, replay: dict, telemetry: dict, models: dict) -> dict | None:
-    if ts_ms is not None and ts_state[0] is not None and ts_ms < ts_state[0]:
-        _reset_state(telemetry, models)
-        return {"layer": "L2A", "msg": "Timestamp regression"}
-
+    # Detect timestamp regression (but allow 24-hour wraparound) (FIX #3)
+    if ts_ms is not None and ts_state[0] is not None:
+        delta_ts = ts_ms - ts_state[0]
+        # Regression if timestamp goes backward by more than 100ms
+        if delta_ts < -100:
+            _reset_state(telemetry, models)
+            return {"layer": "L2A", "msg": "Timestamp regression"}
+    
+    # Update timestamp state
     if ts_ms is not None:
         ts_state[0] = ts_ms
 
+    # Check for replay (duplicate frames)
     if label not in replay:
         replay[label] = deque(maxlen=REPLAY_WINDOW)
-    key = (word, ts_ms)
-    if key in replay[label]:
+    
+    frame_key = (word, ts_ms)
+    if frame_key in replay[label]:
         return {"layer": "L2B", "msg": "Replay"}
-    replay[label].append(key)
-
+    
+    replay[label].append(frame_key)
     return None
 
-# =============================================================================
+# =====
 # def L3(...) — Application: value bounds + kinematic continuity
-# =============================================================================
+# =====
 
 def L3(word: str, label: str, rules: dict, constraints: dict,
         telemetry: dict, models: dict) -> tuple:
@@ -235,38 +263,41 @@ def L3(word: str, label: str, rules: dict, constraints: dict,
 
     return None, delta_abs, value
 
-# =============================================================================
+# =====
 # def L4(...) — Statistical ML: EWMA + rolling z-score
-# =============================================================================
+# =====
 
 def L4(delta_abs: float, model: LabelModel) -> dict:
     ewma_hard = False
     ewma_score = 0.0
     zs_score = 0.0
 
+    # EWMA score: requires enough clean samples
     thresh = model.ewma_threshold
     if thresh is not None and model.n_clean >= L4_WARMUP and delta_abs > thresh * 1.2:
         ewma_hard = True
         ratio = delta_abs / max(thresh * 1.2, 1e-9)
         ewma_score = min(100.0, (ratio - 1.0) * 45.0 + 55.0)
 
+    # Z-score: requires sufficient buffer AND warmup (FIX #1)
     buf = model.zs_buffer
-    if len(buf) >= 10:
+    if len(buf) >= 20 and model.n_clean >= L4_WARMUP:
         arr = np.array(buf)
-        mu, sd = arr.mean(), arr.std()
+        mu = arr.mean()
+        sd = arr.std()
         if sd > 1e-9:
             z = (delta_abs - mu) / sd
             zs_score = max(0.0, min(100.0, (z / ZS_SIGMA) * 100.0))
 
     return {
-        "ewma_hard" : ewma_hard,
+        "ewma_hard": ewma_hard,
         "ewma_score": round(ewma_score, 1),
-        "zs_score"  : round(zs_score, 1),
+        "zs_score": round(zs_score, 1),
     }
 
-# =============================================================================
+# =====
 # def L5(...) — Simple online learning: Welford per-feature z-score
-# =============================================================================
+# =====
 
 def L5(delta_abs: float, word: str, timing_us: float, model: LabelModel) -> dict:
     nn_score = 0.0
@@ -284,9 +315,9 @@ def L5(delta_abs: float, word: str, timing_us: float, model: LabelModel) -> dict
 
     return {"nn_score": round(nn_score, 1)}
 
-# =============================================================================
+# =====
 # def analyse_frame(...) — orchestrates L1 → L5
-# =============================================================================
+# =====
 
 def analyse_frame(
     word: str,
@@ -337,23 +368,22 @@ def analyse_frame(
 
     return {"status": "PASS", "layer": None, "msg": "Passed"}
 
-# =============================================================================
+# =====
 # def run_pipeline(...)
-# =============================================================================
+# =====
 
 def run_pipeline(constraints: dict, models: dict) -> dict:
     results = {}
     layer_catches = {"L1A": 0, "L1B": 0, "L2A": 0, "L2B": 0, "L3": 0, "L4+5": 0}
 
-    telemetry: dict = {}
-    replay: dict = {}
-    ts_state: list = [None]
-
     for file_path in DATASETS:
         resolved_path = _resolve_path(file_path)
-        telemetry.clear()
-        replay.clear()
-        ts_state[0] = None
+        # Reset state for each dataset (FIX #2)
+        models.clear()
+        telemetry = {}
+        replay = {}
+        ts_state = [None]
+        
         name = os.path.basename(resolved_path)
         tp = fp = tn = fn = 0
         layer_dist = {k: 0 for k in layer_catches}
@@ -377,11 +407,12 @@ def run_pipeline(constraints: dict, models: dict) -> dict:
                                      models, ts_state)
                 detected = res["status"] == "ALERT"
 
+                # Count: TP, FP, TN, FN
                 if detected and is_attack:
                     tp += 1
-                    lyr = res.get("layer") or "L4+5"
-                    layer_dist[lyr] = layer_dist.get(lyr, 0) + 1
-                    layer_catches[lyr] += 1
+                    layer = res.get("layer") or "L4+5"
+                    layer_dist[layer] = layer_dist.get(layer, 0) + 1
+                    layer_catches[layer] += 1
                 elif detected:
                     fp += 1
                 elif is_attack:
@@ -389,17 +420,40 @@ def run_pipeline(constraints: dict, models: dict) -> dict:
                 else:
                     tn += 1
 
-        prec = tp / (tp + fp) if (tp + fp) else float("nan")
-        rec = tp / (tp + fn) if (tp + fn) else float("nan")
-        f1 = (2 * prec * rec / (prec + rec)) if (prec + rec) else float("nan")
+        # Calculate metrics
+        if tp + fp > 0:
+            prec = tp / (tp + fp)
+        else:
+            prec = float("nan")
+        
+        if tp + fn > 0:
+            rec = tp / (tp + fn)
+        else:
+            rec = float("nan")
+        
+        if prec + rec > 0:
+            f1 = 2 * prec * rec / (prec + rec)
+        else:
+            f1 = float("nan")
+        
+        # Matthews Correlation Coefficient
         mcc_n = tp * tn - fp * fn
-        mcc_d = math.sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn)) \
-                if (tp+fp)*(tp+fn)*(tn+fp)*(tn+fn) > 0 else 1
+        mcc_denominator = (tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)
+        if mcc_denominator > 0:
+            mcc_d = math.sqrt(mcc_denominator)
+        else:
+            mcc_d = 1
 
+        # Store results for this dataset
         results[name] = {
-            "tp": tp, "fp": fp, "tn": tn, "fn": fn,
+            "tp": tp,
+            "fp": fp,
+            "tn": tn,
+            "fn": fn,
             "total": tp + fp + tn + fn,
-            "precision": prec, "recall": rec, "f1": f1,
+            "precision": prec,
+            "recall": rec,
+            "f1": f1,
             "mcc": mcc_n / mcc_d,
             "layer_dist": layer_dist,
         }
@@ -407,20 +461,30 @@ def run_pipeline(constraints: dict, models: dict) -> dict:
     results["__layer_catches__"] = layer_catches
     return results
 
-# =============================================================================
+# =====
 # def print_results(...)
-# =============================================================================
+# =====
 
 _W = 78
 
 def _pct(v) -> str:
-    return f"{v*100:.1f}%" if v == v else "  N/A "
+    # Format percentage, handling NaN
+    if v == v:  # Check if not NaN
+        return f"{v*100:.1f}%"
+    else:
+        return "  N/A "
 
 def _rule(ch="═"):
+    # Print a separator line
     print("  " + ch * _W)
 
 def print_results(results: dict, models: dict, constraints: dict):
-    dataset_rows = {k: v for k, v in results.items() if not k.startswith("__")}
+    # Separate dataset results from metadata
+    dataset_rows = {}
+    for k, v in results.items():
+        if not k.startswith("__"):
+            dataset_rows[k] = v
+    
     layer_catches = results.get("__layer_catches__", {})
 
     print(); _rule("═")
@@ -433,24 +497,50 @@ def print_results(results: dict, models: dict, constraints: dict):
           f"  {'Prec':>7}  {'Recall':>7}  {'F1':>7}  {'MCC':>6}")
     _rule("─")
 
-    grand = dict(tp=0, fp=0, tn=0, fn=0)
+    # Calculate grand totals
+    grand_tp = 0
+    grand_fp = 0
+    grand_tn = 0
+    grand_fn = 0
+    
     for name, r in dataset_rows.items():
         if "error" in r:
-            print(f"  {name:<26}  {r['error']}"); continue
-        for k in grand: grand[k] += r[k]
+            print(f"  {name:<26}  {r['error']}")
+            continue
+        grand_tp += r["tp"]
+        grand_fp += r["fp"]
+        grand_tn += r["tn"]
+        grand_fn += r["fn"]
         print(f"  {name:<26}  {r['tp']:>4}  {r['fp']:>4}  {r['tn']:>4}  {r['fn']:>4}"
               f"  {_pct(r['precision']):>7}  {_pct(r['recall']):>7}"
               f"  {_pct(r['f1']):>7}  {r['mcc']:>6.3f}")
 
     _rule("─")
-    tp, fp, tn, fn = grand["tp"], grand["fp"], grand["tn"], grand["fn"]
-    gp = tp / (tp+fp) if (tp+fp) else float("nan")
-    gr = tp / (tp+fn) if (tp+fn) else float("nan")
-    gf = 2*gp*gr / (gp+gr) if (gp+gr) else float("nan")
-    mn = tp*tn - fp*fn
-    md = math.sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn)) \
-         if (tp+fp)*(tp+fn)*(tn+fp)*(tn+fn) > 0 else 1
-    print(f"  {'GRAND TOTAL':<26}  {tp:>4}  {fp:>4}  {tn:>4}  {fn:>4}"
+    
+    # Grand total metrics
+    if grand_tp + grand_fp > 0:
+        gp = grand_tp / (grand_tp + grand_fp)
+    else:
+        gp = float("nan")
+    
+    if grand_tp + grand_fn > 0:
+        gr = grand_tp / (grand_tp + grand_fn)
+    else:
+        gr = float("nan")
+    
+    if gp + gr > 0:
+        gf = 2 * gp * gr / (gp + gr)
+    else:
+        gf = float("nan")
+    
+    mn = grand_tp * grand_tn - grand_fp * grand_fn
+    md_denom = (grand_tp + grand_fp) * (grand_tp + grand_fn) * (grand_tn + grand_fp) * (grand_tn + grand_fn)
+    if md_denom > 0:
+        md = math.sqrt(md_denom)
+    else:
+        md = 1
+    
+    print(f"  {'GRAND TOTAL':<26}  {grand_tp:>4}  {grand_fp:>4}  {grand_tn:>4}  {grand_fn:>4}"
           f"  {_pct(gp):>7}  {_pct(gr):>7}  {_pct(gf):>7}  {mn/md:>6.3f}")
     _rule("─"); print()
 
@@ -462,20 +552,23 @@ def print_results(results: dict, models: dict, constraints: dict):
         "L3"  : "L3  Kinematic / Value Bounds",
         "L4+5": "L4+L5  EWMA + Z-Score + Welford",
     }
-    total_attacks = tp + fn
+    total_attacks = grand_tp + grand_fn
     print("  Layer Breakdown")
     _rule("─")
     print(f"  {'Key':<6}  {'Layer':<44}  {'Caught':>6}  {'%':>6}")
     _rule("─")
     for key, desc in _layer_desc.items():
-        n = layer_catches.get(key, 0)
-        pct = f"{100*n/total_attacks:.2f}%" if total_attacks else "—"
-        print(f"  {key:<6}  {desc:<44}  {n:>6}  {pct:>6}")
+        caught = layer_catches.get(key, 0)
+        if total_attacks > 0:
+            pct = f"{100 * caught / total_attacks:.2f}%"
+        else:
+            pct = "—"
+        print(f"  {key:<6}  {desc:<44}  {caught:>6}  {pct:>6}")
     _rule("─"); print()
 
-# =============================================================================
+# =====
 # def main()
-# =============================================================================
+# =====
 
 def main():
     constraints = {}
